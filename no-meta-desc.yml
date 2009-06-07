@@ -1,0 +1,37 @@
+# --- Spizer execution YAML file --- #
+# ---------------------------------- #
+
+default:
+
+  engine:
+    store-cookies: yes
+    lifo:          yes
+    delay:         0
+  
+  logger:
+    type:      Sqlite
+    options:
+      dbfile : no-meta-desc.sq3
+      append:  no
+    
+  handlers:
+
+    LinkAppender:
+      type:         LinkAppender
+      options: 
+        same-domain:  yes
+
+    NoMetaDescTag:
+      type:           NotXPath
+      options:
+        status:       200
+        content-type: text/html
+        query:        "//meta[@name='description']"
+
+    MetaDescEmpty:
+      type:           XPath
+      options:
+        status:       200
+        content-type: text/html
+        query:        "//meta[@name='description' and @content='']"
+        

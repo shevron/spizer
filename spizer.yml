@@ -1,0 +1,38 @@
+# --- Spizer execution YAML file --- #
+# ---------------------------------- #
+
+default:
+
+  engine:
+    store-cookies: yes
+    lifo:          yes
+    delay:         0
+  
+  logger:
+    type:      Sqlite
+    options:
+      dbfile : zend-test.sq3
+      append:  no
+    
+  handlers:
+
+    LinkAppender:
+      type:         LinkAppender
+      options: 
+        same-domain:  yes
+
+    MatchWarningMessages:
+      type:         StringMatch
+      options: 
+        content-type: text/html
+        status:       200
+        match:        warning
+        matchcase:    no
+    
+    MatchErrorMessages:
+      type:         StringMatch
+      options:
+        content-type: text/html
+        status:       200
+        match:        error
+        matchcase:    no
