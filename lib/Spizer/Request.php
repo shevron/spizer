@@ -2,7 +2,7 @@
 
 /**
  * Spizer - the flexible PHP web spider
- * Copyright 2009 Shahar Evron
+ * Copyright 2010 Shahar Evron
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
