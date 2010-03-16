@@ -36,5 +36,5 @@ default:
       options:
         status:       200
         content-type: text/html
-        query:        "//meta[@name='description' and @content='']"
+        query:        "//meta[@name='description' and @content='\']"
         
