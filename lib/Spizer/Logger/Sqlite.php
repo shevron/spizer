@@ -148,7 +148,7 @@ class Spizer_Logger_Sqlite implements Spizer_Logger_Interface
         $this->_db->insert('requests', array(
             'microtime' => microtime(true),
             'url'       => $request->getUri(),
-            'referrer'  => $request->getRefererrer(),
+            'referrer'  => $request->getReferrer(),
             'method'    => $request->getMethod()
         ));
         

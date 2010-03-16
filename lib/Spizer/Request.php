@@ -106,7 +106,7 @@ class Spizer_Request
      *
      * @return string|null Will return null if no referrer is known
      */
-    public function getRefererrer()
+    public function getReferrer()
     {
         return $this->_referrer;
     }

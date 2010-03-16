@@ -130,7 +130,7 @@ class Spizer_Logger_Xml implements Spizer_Logger_Interface
         $this->_writeXml('<uri>' . htmlentities($request->getUri()) . '</uri>');
         $this->_writeXml('<method>' . htmlentities($request->getMethod()) . '</method>');
         
-        $ref = $request->getRefererrer();
+        $ref = $request->getReferrer();
         if ($ref) $this->_writeXml('<referrer>' . htmlentities($ref) . '</referrer>');
         
         foreach($request->getAllHeaders() as $header => $value) {

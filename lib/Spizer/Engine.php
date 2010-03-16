@@ -216,7 +216,7 @@ class Spizer_Engine
        	        fwrite(STDERR, "Error executing request: {$e->getMessage()}.\n");
        	        fwrite(STDERR, "Request information:\n");
        	        fwrite(STDERR, "  {$request->getMethod()} {$request->getUri()}\n");
-       	        fwrite(STDERR, "  Referred  by: {$request->getReferrer()}\n");
+       	        fwrite(STDERR, "  Referred by: {$request->getReferrer()}\n");
        	    }
        	    
     	    $this->logger->logResponse($response);
