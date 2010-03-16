@@ -34,5 +34,8 @@ require_once 'Spizer/Handler/Abstract.php';
  */
 class Spizer_Handler_Validator extends Spizer_Handler_Abstract  
 {
-	
+	public function handle(Spizer_Document $document)
+	{
+	    throw new Spizr_Handler_Exception("The validator handler is not implemented yet");
+	}
 }
