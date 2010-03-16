@@ -63,12 +63,14 @@ class Spizer_Handler_XPath extends Spizer_Handler_Abstract
         
         $query = $this->_config['query'];
         $tags = $document->getXpath()->query($query);
-        if ($tags->length) {
+        if ($tags instanceof DOMNodeList && $tags->length) {
             $data = array(
                 'query'        => $query,
                 'matchingTags' => count($tags->length),
             );
-            if (isset($this->_config['message'])) $data['message'] = $this->_config['message'];
+            
+            if (isset($this->_config['message'])) 
+                $data['message'] = $this->_config['message'];
             
             $this->_engine->log('XPath', $data);
         }
