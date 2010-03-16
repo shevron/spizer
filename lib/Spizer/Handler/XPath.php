@@ -70,7 +70,7 @@ class Spizer_Handler_XPath extends Spizer_Handler_Abstract
             );
             if (isset($this->_config['message'])) $data['message'] = $this->_config['message'];
             
-            $this->engine->log('XPath', $data);
+            $this->_engine->log('XPath', $data);
         }
     }
 }

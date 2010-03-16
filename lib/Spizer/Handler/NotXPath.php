@@ -50,7 +50,7 @@ class Spizer_Handler_NotXPath extends Spizer_Handler_XPath
         if ($tags->length == 0) {
             $data = array('query' => $query);
             if (isset($this->_config['message'])) $data['message'] = $this->_config['message'];
-            $this->engine->log('NotXPath', $data);
+            $this->_engine->log('NotXPath', $data);
         }
     }
 }

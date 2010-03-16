@@ -62,7 +62,7 @@ class Spizer_Handler_RegexMatch extends Spizer_Handler_StringMatch
     public function handle(Spizer_Document $document)
     {
         if (preg_match($this->_config['match'], $document->getBody(), $m, PREG_OFFSET_CAPTURE)) {
-            $this->engine->log('RegexMatch', array(
+            $this->_engine->log('RegexMatch', array(
                 'message' => 'Document body matched lookup expression',
             	'regex'   => $this->_config['match'],
                 'match'   => $m[0][0],

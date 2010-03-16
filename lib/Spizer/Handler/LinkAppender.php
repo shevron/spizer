@@ -61,7 +61,7 @@ class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract
     {
         // If need, set the match domain according to the first URL
         if (! isset($this->_config['domain']) && $this->_config['same-domain']) {
-            $this->_config['domain'] = $this->engine->getBaseUri()->getHost();
+            $this->_config['domain'] = $this->_engine->getBaseUri()->getHost();
         }
         
         // Add document URL to the list of visited pages
@@ -119,7 +119,7 @@ class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract
 				    
 				// If any of the URL parts is invalid, an exception will be caught here
 			    } catch (Zend_Uri_Exception $e) {
-			        $this->engine->log('LinkAppender', array(
+			        $this->_engine->log('LinkAppender', array(
 			            'link'    => $link,  
 			            'message' => 'Unable to parse link URL: ' . $e->getMessage()
 			        ));
@@ -140,7 +140,7 @@ class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract
         if (! in_array($url, $this->_targets)) {
             $request = new Spizer_Request($url);
             $request->setReferrer($referrer);
-            $this->engine->getQueue()->append($request);
+            $this->_engine->getQueue()->append($request);
             
             $this->_targets[] = $url;
         }

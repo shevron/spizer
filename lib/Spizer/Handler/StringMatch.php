@@ -63,7 +63,7 @@ class Spizer_Handler_StringMatch extends Spizer_Handler_Abstract
         $body = $document->getBody();
 
         if (($pos = $strpos($body, $this->_config['match'])) !== false) {
-            $this->engine->log('StringMatch', array(
+            $this->_engine->log('StringMatch', array(
                 'message' => 'Document body matched lookup string',
             	'needle'  => $this->_config['match'],
                 'offset'  => $pos
