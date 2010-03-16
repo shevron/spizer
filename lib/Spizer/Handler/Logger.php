@@ -42,7 +42,7 @@ class Spizer_Handler_Logger extends Spizer_Handler_Abstract
 	 *
 	 * @var Zend_Log
 	 */
-	protected $logger = null;
+	protected $_logger = null;
 	
 	/**
 	 * Create a new Logger Handler
@@ -51,7 +51,7 @@ class Spizer_Handler_Logger extends Spizer_Handler_Abstract
 	 */
 	public function __construct(Zend_Log $logger)
 	{
-		$this->logger = $logger;
+		$this->_logger = $logger;
 	}
 	
 	/**
@@ -84,6 +84,6 @@ class Spizer_Handler_Logger extends Spizer_Handler_Abstract
 	            break;
 	    }
 		
-	    $this->logger->log($string, $level);
+	    $this->_logger->log($string, $level);
 	}
 }

@@ -33,15 +33,15 @@ require_once 'Spizer/Document/Xml.php';
  */
 class Spizer_Document_Html extends Spizer_Document_Xml
 {
-	protected $links       = null;
+	protected $_links       = null;
 	
-	protected $images      = null;
+	protected $_images      = null;
 	
-	protected $headerlinks = null;
+	protected $_headerlinks = null;
 	
-	protected $scripts     = null;
+	protected $_scripts     = null;
 	
-	protected $forms       = null;
+	protected $_forms       = null;
 	
 	/**
 	 * Get all <a href=""> links out of this document
@@ -51,16 +51,16 @@ class Spizer_Document_Html extends Spizer_Document_Xml
 	 */
 	public function getLinks()
 	{
-		if ($this->links == null) {
-			$this->links = array();
+		if ($this->_links == null) {
+			$this->_links = array();
 			$links = $this->getXpath()->query("//a[@href]");
 		
 			foreach ($links as $link) {
-				$this->links[] = $link->getAttribute('href');
+				$this->_links[] = $link->getAttribute('href');
 			}
 		}
 		
-		return $this->links; 
+		return $this->_links; 
 	}
 	
 	/**
@@ -72,16 +72,16 @@ class Spizer_Document_Html extends Spizer_Document_Xml
 	 */
 	public function getHeaderLinks()
 	{
-	    if ($this->headerlinks == null) {
-	        $this->headerlinks = array();
+	    if ($this->_headerlinks == null) {
+	        $this->_headerlinks = array();
 	        $links = $this->getXpath()->query("//link[@href]");
 		
 			foreach ($links as $link) {
-				$this->headerlinks[] = $link->getAttribute('href');
+				$this->_headerlinks[] = $link->getAttribute('href');
 			}
 	    }
 	    
-	    return $this->headerlinks;
+	    return $this->_headerlinks;
 	}
 	
 	/**
@@ -91,16 +91,16 @@ class Spizer_Document_Html extends Spizer_Document_Xml
 	 */
 	public function getImages()
 	{
-	    if ($this->images == null) {
-	        $this->images = array();
+	    if ($this->_images == null) {
+	        $this->_images = array();
 	        $images = $this->getXpath()->query("//img[@src]");
 	        
 	        foreach ($images as $img) {
-	            $this->images[] = $img->getAttribute('src');
+	            $this->_images[] = $img->getAttribute('src');
 	        }
 	    }
 	    
-	    return $this->images;
+	    return $this->_images;
 	}
 	
 	/**
@@ -110,15 +110,15 @@ class Spizer_Document_Html extends Spizer_Document_Xml
 	 */
 	public function getScriptLinks()
 	{
-	    if ($this->scripts == null) {
-	        $this->scripts = array();
+	    if ($this->_scripts == null) {
+	        $this->_scripts = array();
 	        $scripts = $this->getXpath()->query("//script[@src]");
 	        
 	        foreach ($scripts as $script) {
-	            $this->scripts[] = $script->getAttribute('src');
+	            $this->_scripts[] = $script->getAttribute('src');
 	        }
 	    }
 	    
-	    return $this->scripts;
+	    return $this->_scripts;
 	}
 }

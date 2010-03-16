@@ -38,25 +38,25 @@ class Spizer_Document_Xml extends Spizer_Document
 	 *
 	 * @var DOMDocument
 	 */
-	protected $domDocument = null;
+	protected $_domDocument = null;
 
 	/**
 	 * DOM XPath object - generated on demand using self::getXpath()
 	 *
 	 * @var DOMXPath
 	 */
-	protected $domXpath    = null;
+	protected $_domXpath    = null;
 	
 	protected function __construct($url, $status, array $headers, $body)
 	{
 		parent::__construct($url, $status, $headers, $body);
 		
-		$this->domDocument = new DOMDocument();
-		$this->domDocument->preserveWhiteSpace = true;
+		$this->_domDocument = new DOMDocument();
+		$this->_domDocument->preserveWhiteSpace = true;
 		
 		// We have to silence this out because invalid documents
 		// tend to throw allot of warnings
-		@$this->domDocument->loadHtml($body);	
+		@$this->_domDocument->loadHtml($body);	
 	}
 
 	/**
@@ -66,7 +66,7 @@ class Spizer_Document_Xml extends Spizer_Document
 	 */
 	public function getDomDocument()
 	{
-		return $this->domDocument;
+		return $this->_domDocument;
 	}
 	
 	/**
@@ -76,10 +76,10 @@ class Spizer_Document_Xml extends Spizer_Document
 	 */
 	public function getXpath()
 	{
-	    if (! $this->domXpath) {
-	        $this->domXpath = new DOMXPath($this->domDocument);
+	    if (! $this->_domXpath) {
+	        $this->_domXpath = new DOMXPath($this->_domDocument);
 	    }
 	    
-	    return $this->domXpath;
+	    return $this->_domXpath;
 	}
 }

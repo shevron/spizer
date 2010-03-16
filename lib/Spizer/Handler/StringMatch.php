@@ -32,7 +32,7 @@ require_once 'Spizer/Handler/Abstract.php';
  */
 class Spizer_Handler_StringMatch extends Spizer_Handler_Abstract
 {
-    protected $config = array(
+    protected $_config = array(
         'matchcase' => false
     );
     
@@ -59,13 +59,13 @@ class Spizer_Handler_StringMatch extends Spizer_Handler_Abstract
      */
     public function handle(Spizer_Document $document)
     {
-        $strpos = ($this->config['matchcase'] ? 'strpos' : 'stripos');
+        $strpos = ($this->_config['matchcase'] ? 'strpos' : 'stripos');
         $body = $document->getBody();
 
-        if (($pos = $strpos($body, $this->config['match'])) !== false) {
+        if (($pos = $strpos($body, $this->_config['match'])) !== false) {
             $this->engine->log('StringMatch', array(
                 'message' => 'Document body matched lookup string',
-            	'needle'  => $this->config['match'],
+            	'needle'  => $this->_config['match'],
                 'offset'  => $pos
             ));
         }

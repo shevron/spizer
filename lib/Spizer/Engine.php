@@ -47,28 +47,28 @@ class Spizer_Engine
 	 *
 	 * @var Zend_Http_Client
 	 */
-	protected $httpClient   = null;
+	protected $_httpClient   = null;
 	
 	/**
 	 * Base URL to use for relative links 
 	 *
 	 * @var Zend_Uri_Http
 	 */
-	protected $baseUri      = null;
+	protected $_baseUri      = null;
 	
 	/**
 	 * Handlers to run on all visited pages
 	 * 
 	 * @var array
 	 */
-	protected $handlers     = array();
+	protected $_handlers     = array();
 	
 	/**
 	 * Array of URLS to be scanned
 	 *
 	 * @var Spizer_Queue
 	 */
-	protected $queue        = null;
+	protected $_queue        = null;
 	
 	/**
 	 * Logger object
@@ -82,7 +82,7 @@ class Spizer_Engine
 	 *
 	 * @var array
 	 */
-	protected $config       = array(
+	protected $_config       = array(
 	    'savecookies' => true,
 	    'lifo'        => false,
 	    'httpOpts'    => array()
@@ -93,7 +93,7 @@ class Spizer_Engine
 	 *
 	 * @var integer
 	 */
-	protected $requestCounter = 0;
+	protected $_requestCounter = 0;
 	
 	/**
 	 * Create a new Spizer Engine object
@@ -104,25 +104,25 @@ class Spizer_Engine
 	{
    		// Load configuration
 		foreach ($config as $k => $v) {
-			$this->config[$k] = $v;
+			$this->_config[$k] = $v;
 		}
 		
 		// Set up the HTTP client
-		$this->httpClient = new Zend_Http_Client();
-		if ($this->config['savecookies']) $this->httpClient->setCookieJar();
+		$this->_httpClient = new Zend_Http_Client();
+		if ($this->_config['savecookies']) $this->_httpClient->setCookieJar();
 		
-		if (isset($this->config['httpOpts']) && is_array($this->config['httpOpts'])) {
-		    $httpOpts = $this->config['httpOpts'];
+		if (isset($this->_config['httpOpts']) && is_array($this->_config['httpOpts'])) {
+		    $httpOpts = $this->_config['httpOpts'];
 		} else {
 		    $httpOpts = array();
 		}
 		
 		$httpOpts['maxredirects'] = 0;
 		
-		$this->httpClient->setConfig($httpOpts);
+		$this->_httpClient->setConfig($httpOpts);
 		
 		// Set up the queue
-		$this->queue = new Spizer_Queue($this->config['lifo']);
+		$this->_queue = new Spizer_Queue($this->_config['lifo']);
 	}
 	
 	/**
@@ -132,7 +132,7 @@ class Spizer_Engine
 	 */
 	public function getHttpClient()
 	{
-		return $this->httpClient;
+		return $this->_httpClient;
 	}
 	
 	/**
@@ -188,8 +188,8 @@ class Spizer_Engine
 			require_once 'Spizer/Exception.php';
 			throw new Spizer_Exception("'$url' is not a valid HTTP URI");
 		}
-		$this->baseUri = Zend_Uri::factory($url);
-		$this->queue->append($url);
+		$this->_baseUri = Zend_Uri::factory($url);
+		$this->_queue->append($url);
 		
 		// Set the default logger if not already set
 		if (! $this->logger) {
@@ -198,20 +198,20 @@ class Spizer_Engine
 		}
 		
 		// Go!
-		while (($request = $this->queue->next())) {
+		while ($request = $this->_queue->next()) {
 		    $this->logger->startPage();
 	        $this->logger->logRequest($request);
 		    
     	    // Prepare HTTP client for next request
-	        $this->httpClient->resetParameters();
-	        $this->httpClient->setUri($request->getUri());
-    	    $this->httpClient->setMethod($request->getMethod());
-	        $this->httpClient->setHeaders($request->getAllHeaders());
-	        $this->httpClient->setRawData($request->getBody());
+	        $this->_httpClient->resetParameters();
+	        $this->_httpClient->setUri($request->getUri());
+    	    $this->_httpClient->setMethod($request->getMethod());
+	        $this->_httpClient->setHeaders($request->getAllHeaders());
+	        $this->_httpClient->setRawData($request->getBody());
 		    
        	    // Send request, catching any HTTP related issues that might happen
        	    try {
-	            $response = new Spizer_Response($this->httpClient->request());
+	            $response = new Spizer_Response($this->_httpClient->request());
        	    } catch (Zend_Exception $e) {
        	        fwrite(STDERR, "Error executing request: {$e->getMessage()}.\n");
        	        fwrite(STDERR, "Request information:\n");
@@ -222,14 +222,14 @@ class Spizer_Engine
     	    $this->logger->logResponse($response);
 	    
 	        // Call handlers
-	        $this->callHandlers($request, $response);
+	        $this->_callHandlers($request, $response);
 	    
     	    // End page
 	        $this->logger->endPage();
-	        ++$this->requestCounter;
+	        ++$this->_requestCounter;
 	    
     	    // Wait if a delay was set
-	    	if (isset($this->config['delay'])) sleep($this->config['delay']);
+	    	if (isset($this->_config['delay'])) sleep($this->_config['delay']);
 		}
 	}
 	
@@ -247,13 +247,13 @@ class Spizer_Engine
 	public function authenticateUrl($url, array $data, $method = Zend_Http_Client::POST)
 	{
 		if ($method == 'POST') {
-			$this->httpClient->setParameterPost($data);
+			$this->_httpClient->setParameterPost($data);
 		} else {
-			$this->httpClient->setParameterGet($data);
+			$this->_httpClient->setParameterGet($data);
 		}
 		
-		$this->httpClient->setUri($url);
-		$this->httpClient->request($method);
+		$this->_httpClient->setUri($url);
+		$this->_httpClient->request($method);
 		
 		return $this;
 	}
@@ -265,7 +265,7 @@ class Spizer_Engine
 	 */
 	public function getQueue()
 	{
-		return $this->queue;
+		return $this->_queue;
 	}
 	
 	/**
@@ -277,7 +277,7 @@ class Spizer_Engine
 	public function addHandler(Spizer_Handler_Abstract $handler)
 	{
 		$handler->setEngine($this);
-		$this->handlers[] = $handler;
+		$this->_handlers[] = $handler;
 		return $this;
 	}
 	
@@ -288,7 +288,7 @@ class Spizer_Engine
 	 */
 	public function getRequestCounter()
 	{
-	    return $this->requestCounter;
+	    return $this->_requestCounter;
 	}
 	
 	/**
@@ -298,7 +298,7 @@ class Spizer_Engine
 	 */
 	public function getBaseUri()
 	{
-	    return $this->baseUri;
+	    return $this->_baseUri;
 	}
 	
 	/**
@@ -307,12 +307,12 @@ class Spizer_Engine
 	 * @param Spizer_Request  $request
 	 * @param Spizer_Response $response
 	 */
-	private function callHandlers(Spizer_Request $request, Spizer_Response $response)
+	private function _callHandlers(Spizer_Request $request, Spizer_Response $response)
 	{
 	    $document = Spizer_Document::factory($request, $response);
 	    
 	    // Run all common handlers
-	    foreach ($this->handlers as $handler) {
+	    foreach ($this->_handlers as $handler) {
 			$handler->call($document);
 		}
 	}

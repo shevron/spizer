@@ -11,7 +11,7 @@ default:
   logger:
     type:      Sqlite
     options:
-      dbfile : zend-test.sq3
+      dbfile : spizer-test.sq3
       append:  no
     
   handlers:

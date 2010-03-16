@@ -39,9 +39,9 @@ require_once 'Spizer/Handler/Abstract.php';
  */
 class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract 
 {
-    private $targets = array();
+    private $_targets = array();
     
-    protected $config = array(
+    protected $_config = array(
         'status'        => null,
         'content-type'  => null,
         'follow_href'   => true,
@@ -60,23 +60,23 @@ class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract
     public function handle(Spizer_Document $doc)
     {
         // If need, set the match domain according to the first URL
-        if (! isset($this->config['domain']) && $this->config['same-domain']) {
-            $this->config['domain'] = $this->engine->getBaseUri()->getHost();
+        if (! isset($this->_config['domain']) && $this->_config['same-domain']) {
+            $this->_config['domain'] = $this->engine->getBaseUri()->getHost();
         }
         
         // Add document URL to the list of visited pages
         $baseUrl = (string) $doc->getUrl();
-        if (! in_array($baseUrl, $this->targets)) $this->targets[] = $baseUrl;
+        if (! in_array($baseUrl, $this->_targets)) $this->_targets[] = $baseUrl;
         
         // Silently skip all non-HTML documents
         if (! $doc instanceof Spizer_Document_Html) return;
         
         // Fetch links out of the document
         $links = array();
-        if ($this->config['follow_href'])   $links = array_merge($links, $doc->getLinks()); 
-        if ($this->config['follow_img'])    $links = array_merge($links, $doc->getImages());
-        if ($this->config['follow_link'])   $links = array_merge($links, $doc->getHeaderLinks());
-        if ($this->config['follow_script']) $links = array_merge($links, $doc->getScriptLinks());
+        if ($this->_config['follow_href'])   $links = array_merge($links, $doc->getLinks()); 
+        if ($this->_config['follow_img'])    $links = array_merge($links, $doc->getImages());
+        if ($this->_config['follow_link'])   $links = array_merge($links, $doc->getHeaderLinks());
+        if ($this->_config['follow_script']) $links = array_merge($links, $doc->getScriptLinks());
         
         // Iterate over all document links
 		foreach ($links as $link) {
@@ -89,8 +89,8 @@ class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract
 			
 			// Full URI
 			if (isset($parts['host'])) { 
-				if (preg_match('/' . preg_quote($this->config['domain']) . '$/', $parts['host'])) {
-				    $this->addToQueue($link, $baseUrl);
+				if (preg_match('/' . preg_quote($this->_config['domain']) . '$/', $parts['host'])) {
+				    $this->_addToQueue($link, $baseUrl);
 				}
 
 		    // Partial URI
@@ -115,7 +115,7 @@ class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract
 					    }
 				    }
 
-				    $this->addToQueue($linkUri, $baseUrl);
+				    $this->_addToQueue($linkUri, $baseUrl);
 				    
 				// If any of the URL parts is invalid, an exception will be caught here
 			    } catch (Zend_Uri_Exception $e) {
@@ -133,16 +133,16 @@ class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract
      *
      * @param Zend_Uri_Http|string $url
      */
-    private function addToQueue($url, $referrer)
+    private function _addToQueue($url, $referrer)
     {
         $url = (string) $url;
         
-        if (! in_array($url, $this->targets)) {
+        if (! in_array($url, $this->_targets)) {
             $request = new Spizer_Request($url);
             $request->setReferrer($referrer);
             $this->engine->getQueue()->append($request);
             
-            $this->targets[] = $url;
+            $this->_targets[] = $url;
         }
     }
 }

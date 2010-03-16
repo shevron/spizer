@@ -1,6 +1,9 @@
 # --- Spizer execution YAML file --- #
 # ---------------------------------- #
 
+# This sample shows how to create a crawler that looks for pages that has no
+# <meta description> tag
+
 default:
 
   engine:

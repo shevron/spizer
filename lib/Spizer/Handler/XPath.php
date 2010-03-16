@@ -61,14 +61,14 @@ class Spizer_Handler_XPath extends Spizer_Handler_Abstract
         // Silently ignore non-XML documents
         if (! $document instanceof Spizer_Document_Xml) return;
         
-        $query = $this->config['query'];
+        $query = $this->_config['query'];
         $tags = $document->getXpath()->query($query);
         if ($tags->length) {
             $data = array(
                 'query'        => $query,
                 'matchingTags' => count($tags->length),
             );
-            if (isset($this->config['message'])) $data['message'] = $this->config['message'];
+            if (isset($this->_config['message'])) $data['message'] = $this->_config['message'];
             
             $this->engine->log('XPath', $data);
         }

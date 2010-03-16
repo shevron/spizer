@@ -41,14 +41,14 @@ class Spizer_Logger_Sqlite implements Spizer_Logger_Interface
      *
      * @var Zend_Db_Adapter_Pdo_Sqlite
      */
-    private $db = null;
+    private $_db = null;
     
     /**
      * Current request ID
      *
      * @var integer
      */
-    private $currentReqId = null;
+    private $_currentReqId = null;
     
     /**
      * 
@@ -67,44 +67,44 @@ class Spizer_Logger_Sqlite implements Spizer_Logger_Interface
         }
         
         // Instantiate the adapter
-        $this->db = Zend_Db::factory('PDO_SQLITE', array('dbname' => $config['dbfile']));
+        $this->_db = Zend_Db::factory('PDO_SQLITE', array('dbname' => $config['dbfile']));
         
         // Set up the database and tables
         if (! (isset($config['append']) && $config['append'])) {
-            $this->db->query("DROP TABLE IF EXISTS requests");
-            $this->db->query("DROP TABLE IF EXISTS request_headers");
-            $this->db->query("DROP TABLE IF EXISTS responses");
-            $this->db->query("DROP TABLE IF EXISTS response_headers");
-            $this->db->query("DROP TABLE IF EXISTS messages");
+            $this->_db->query("DROP TABLE IF EXISTS requests");
+            $this->_db->query("DROP TABLE IF EXISTS request_headers");
+            $this->_db->query("DROP TABLE IF EXISTS responses");
+            $this->_db->query("DROP TABLE IF EXISTS response_headers");
+            $this->_db->query("DROP TABLE IF EXISTS messages");
         }
         
-        $this->db->query("CREATE TABLE IF NOT EXISTS requests(
+        $this->_db->query("CREATE TABLE IF NOT EXISTS requests(
         					id INTEGER NOT NULL PRIMARY KEY, 
         					microtime REAL NOT NULL, 
         					url TEXT NOT NULL,
         					referrer TEXT, 
         					method VARCHAR(10) NOT NULL)");
         
-        $this->db->query("CREATE TABLE IF NOT EXISTS request_headers(
+        $this->_db->query("CREATE TABLE IF NOT EXISTS request_headers(
         					id INTEGER NOT NULL PRIMARY KEY, 
         					request_id INTEGER NOT NULL, 
         					header VARCHAR(50) NOT NULL, 
         					value TEXT)");
         
-        $this->db->query("CREATE TABLE IF NOT EXISTS responses(
+        $this->_db->query("CREATE TABLE IF NOT EXISTS responses(
         					id INTEGER NOT NULL PRIMARY KEY, 
         					request_id INTEGER NOT NULL, 
         					microtime REAL NOT NULL, 
         					statuscode INTEGER NOT NULL, 
         					message VARCHAR(30) NOT NULL)");
         
-        $this->db->query("CREATE TABLE IF NOT EXISTS response_headers(
+        $this->_db->query("CREATE TABLE IF NOT EXISTS response_headers(
         					id INTEGER NOT NULL PRIMARY KEY, 
         					request_id INTEGER NOT NULL, 
         					header VARCHAR(50) NOT NULL, 
         					value TEXT)");
         
-        $this->db->query("CREATE TABLE IF NOT EXISTS messages(
+        $this->_db->query("CREATE TABLE IF NOT EXISTS messages(
         					id INTEGER NOT NULL PRIMARY KEY, 
         					request_id INTEGER NOT NULL, 
         					handler VARCHAR(30) NOT NULL, 
@@ -131,8 +131,8 @@ class Spizer_Logger_Sqlite implements Spizer_Logger_Interface
      */
     public  function logHandlerInfo($handler,$info = array())
     {
-        $handler = $this->db->quote($handler);
-        $stmt = $this->db->prepare("INSERT INTO messages (request_id, handler, key, value) VALUES ({$this->currentReqId}, {$handler}, ?, ?)");
+        $handler = $this->_db->quote($handler);
+        $stmt = $this->_db->prepare("INSERT INTO messages (request_id, handler, key, value) VALUES ({$this->_currentReqId}, {$handler}, ?, ?)");
         foreach ($info as $k => $v) {
             $stmt->execute(array($k, $v));
         }
@@ -145,16 +145,16 @@ class Spizer_Logger_Sqlite implements Spizer_Logger_Interface
      */
     public  function logRequest(Spizer_Request $request) 
     {
-        $this->db->insert('requests', array(
+        $this->_db->insert('requests', array(
             'microtime' => microtime(true),
             'url'       => $request->getUri(),
             'referrer'  => $request->getRefererrer(),
             'method'    => $request->getMethod()
         ));
         
-        $this->currentReqId = $this->db->lastInsertId('requests', 'id');
+        $this->_currentReqId = $this->_db->lastInsertId('requests', 'id');
         
-        $stmt = $this->db->prepare("INSERT INTO request_headers (request_id, header, value) VALUES ({$this->currentReqId}, ?, ?)");
+        $stmt = $this->_db->prepare("INSERT INTO request_headers (request_id, header, value) VALUES ({$this->_currentReqId}, ?, ?)");
         foreach ($request->getAllHeaders() as $k => $v) {
             $stmt->execute(array($k, $v));
         }
@@ -167,14 +167,14 @@ class Spizer_Logger_Sqlite implements Spizer_Logger_Interface
      */
     public  function logResponse(Spizer_Response $response) 
     {
-        $this->db->insert('responses', array(
+        $this->_db->insert('responses', array(
             'microtime'  => microtime(true),
-            'request_id' => $this->currentReqId,
+            'request_id' => $this->_currentReqId,
             'statuscode' => $response->getStatus(),
             'message'    => $response->getMessage()
         ));
         
-        $stmt = $this->db->prepare("INSERT INTO response_headers (request_id, header, value) VALUES ({$this->currentReqId}, ?, ?)");
+        $stmt = $this->_db->prepare("INSERT INTO response_headers (request_id, header, value) VALUES ({$this->_currentReqId}, ?, ?)");
         foreach ($response->getAllHeaders() as $k => $v) {
             $stmt->execute(array($k, $v));
         }

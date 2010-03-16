@@ -40,42 +40,42 @@
  */
 class Spizer_Document
 {
-	protected $url     = null;
+	protected $_url     = null;
 	
-	protected $body    = null;
+	protected $_body    = null;
 	
-	protected $headers = array();
+	protected $_headers = array();
 	
-	protected $status  = null;
+	protected $_status  = null;
 	
 	protected function __construct($url, $status, array $headers, $body)
 	{
-		$this->url     = $url;
-		$this->status  = $status;
-		$this->headers = $headers;
-		$this->body    = $body;
+		$this->_url     = $url;
+		$this->_status  = $status;
+		$this->_headers = $headers;
+		$this->_body    = $body;
 	}
 	
 	public function getUrl()
 	{
-		return $this->url;
+		return $this->_url;
 	}
 	
 	public function getBody()
 	{
-		return $this->body;
+		return $this->_body;
 	}
 	
 	public function getStatus()
 	{
-		return $this->status;
+		return $this->_status;
 	}
 	
 	public function getHeader($header)
 	{
 		$header = strtolower($header);
-		if (isset($this->headers[$header])) {
-			return $this->headers[$header];
+		if (isset($this->_headers[$header])) {
+			return $this->_headers[$header];
 		} else {
 			return null;
 		}

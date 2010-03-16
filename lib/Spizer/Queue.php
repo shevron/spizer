@@ -54,7 +54,7 @@ class Spizer_Queue implements Countable
      *
      * @var array
      */
-    private $targets = array();
+    private $_targets = array();
     
     /**
      * LIFO flag - if set to true, the queue is in fact a stack, serving 
@@ -62,7 +62,7 @@ class Spizer_Queue implements Countable
      *
      * @var boolean
      */
-    private $lifo    = false;
+    private $_lifo    = false;
     
     /**
      * Create a new queue object
@@ -71,7 +71,7 @@ class Spizer_Queue implements Countable
      */
     public function __construct($lifo = false)
     {
-        $this->lifo = (boolean) $lifo;
+        $this->_lifo = (boolean) $lifo;
     }
         
     /**
@@ -81,7 +81,7 @@ class Spizer_Queue implements Countable
      */
     public function count() 
     {
-        return count($this->targets);
+        return count($this->_targets);
     }
     
     /**
@@ -91,10 +91,10 @@ class Spizer_Queue implements Countable
      */
     public function next()
     {
-        if ($this->lifo) {
-            return array_pop($this->targets);
+        if ($this->_lifo) {
+            return array_pop($this->_targets);
         } else {
-            return array_shift($this->targets);
+            return array_shift($this->_targets);
         }
     }
     
@@ -110,6 +110,6 @@ class Spizer_Queue implements Countable
 		    $value = new Spizer_Request((string) $value);
 	    }
 		
-	    $this->targets[] = $value;
+	    $this->_targets[] = $value;
 	}
 }

@@ -46,21 +46,21 @@ abstract class Spizer_Handler_Abstract
 	 *
 	 * @var Spizer_Engine
 	 */
-	protected $engine = null;
+	protected $_engine = null;
 	
 	/**
 	 * Handler name - can be set using setHandlerName()
 	 *
 	 * @var string
 	 */
-	protected $name   = 'DefaultHandler';
+	protected $_name   = 'DefaultHandler';
 	
 	/**
 	 * Handler configuration array
 	 *
 	 * @var array
 	 */
-	protected $config = array(
+	protected $_config = array(
 	    'status'       => null,
 	    'content-type' => null
 	);
@@ -72,9 +72,7 @@ abstract class Spizer_Handler_Abstract
 	 */
 	public function __construct(array $config = array())
 	{
-	    foreach($config as $k => $v) {
-	        $this->config[$k] = $v;
-	    }
+	    $this->_config = array_merge($this->_config, $config);
 	}
 	
 	/**
@@ -84,7 +82,7 @@ abstract class Spizer_Handler_Abstract
 	 */
 	public function setEngine(Spizer_Engine $engine)
 	{
-		$this->engine = $engine;
+		$this->_engine = $engine;
 	}
 	
 	/**
@@ -99,18 +97,18 @@ abstract class Spizer_Handler_Abstract
 	    $type   = $document->getHeader('content-type');
 	    
 	    $call = true;
-	    if ($this->config['status']) {
-	        if (is_array($this->config['status'])) {
-	            if (! in_array($status, $this->config['status'])) $call = false;
-	        } elseif ($this->config['status'] != $status) {
+	    if ($this->_config['status']) {
+	        if (is_array($this->_config['status'])) {
+	            if (! in_array($status, $this->_config['status'])) $call = false;
+	        } elseif ($this->_config['status'] != $status) {
 	            $call = false;
 	        }
 	    }
 	    
-	    if ($this->config['content-type']) {
-	        if (is_array($this->config['content-type'])) {
-	            if (! in_array($type, $this->config['content-type'])) $call = false;
-	        } elseif ($this->config['content-type'] != $type) {
+	    if ($this->_config['content-type']) {
+	        if (is_array($this->_config['content-type'])) {
+	            if (! in_array($type, $this->_config['content-type'])) $call = false;
+	        } elseif ($this->_config['content-type'] != $type) {
 	            $call = false;
 	        }
 	    }
@@ -126,7 +124,7 @@ abstract class Spizer_Handler_Abstract
 	 */
 	public function setHandlerName($name)
 	{
-	    $this->name = $name;
+	    $this->_name = $name;
 	}
 	
 	/**
