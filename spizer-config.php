@@ -15,14 +15,14 @@
  * @license    Licensed under the Apache License 2.0, see COPYING for details
  */
 
+define('SPIZER_VERSION', '0.1');
+
 set_include_path(dirname(__FILE__) . '/lib' . PATH_SEPARATOR . get_include_path());
 
-require_once 'Zend/Console/Getopt.php';
-require_once 'Zend/Loader.php';
-require_once 'Spizer/Config.php';
-require_once 'Spizer/Engine.php';
+require_once 'Zend/Loader/Autoloader.php';
 
-define('SPIZER_VERSION', '0.1');
+$loader = Zend_Loader_Autoloader::getInstance();
+$loader->registerNamespace('Spizer_');
 
 $opts = new Zend_Console_Getopt(array(
     'yml|y=s'     => 'Use a YAML configuration file',
