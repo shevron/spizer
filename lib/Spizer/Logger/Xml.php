@@ -22,14 +22,11 @@
 require_once 'Spizer/Logger/Interface.php';
 
 /**
- * Spizer XML logger class - will log all information to a file (or to any 
- * other PHP stream) in XML format. 
+ * Spizer XML logger class 
  * 
- * For simplicity and memory usage reasons, this logger does not use any PHP
- * XML processing interface - but manually prints out the XML as a string,
- * saving memory and processing overhead 
+ * Will log all information to a file (or to any other PHP stream) in XML 
+ * format. Requires the XMLWriter PHP extension to be loaded. 
  * 
- * @todo       Rewrite to use XMLWriter
  * 
  * @package    Spizer
  * @subpackage Logger
@@ -38,52 +35,59 @@ require_once 'Spizer/Logger/Interface.php';
  */
 class Spizer_Logger_Xml implements Spizer_Logger_Interface
 {
-    protected $_target    = null;
+    /**
+     * XMLWriter object
+     * 
+     * @var XMLWriter
+     */
+    protected $_writer;
     
-    protected $_inPage    = false;
-    
-    protected $_indent    = 0;
-    
-    protected $_indentStr = "  ";
+    /**
+     * Configuration options
+     * 
+     * @var array
+     */
+    protected $_config = array(
+        'target'     => 'php://stdout',
+        'logheaders' => true,
+        'indent'     => true,
+        'indentstr'  => '  '
+    );
     
     /**
      * 
      */
     function __construct($config = array()) 
     {
-        if (! isset($config['target'])) $config['target'] = 'php://stdout';
-        $mode = ((isset($config['append']) && $config['append']) ? 'a' : 'w');  
-        
-        if (isset($config['indentstr'])) $this->_indentStr = (string) $config['indentstr'];
-        
-        // Open log file for writing / appending
-        $this->_target = @fopen($config['target'], $mode);
-        if (! $this->_target) {
+        if (! class_exists('XMLWriter')) {
             require_once 'Spizer/Logger/Exception.php';
-            throw new Spizer_Logger_Exception('Cannot open log file "' . $config['target'] . '" for writing');
+            throw new Spizer_Logger_Exception('The XMLWriter PHP extension is not loaded');
         }
         
-        // Start the XML document
-        $this->_writeXml('<?xml version="1.0" encoding="UTF-8"?>');
-        $this->_writeXml('<spizerlog microtime="' . microtime(true) . '">');
+        $this->_config = array_merge($this->_config, $config);
         
-        ++$this->_indent;
+        $this->_writer = new XMLWriter();
+        if (! $this->_writer->openUri($this->_config['target'])) {
+            require_once 'Spizer/Logger/Exception.php';
+            throw new Spizer_Logger_Exception('Cannot open log file "' . $this->_config['target'] . '" for writing');
+        }
+        
+        $this->_writer->setIndent($this->_config['indent']);
+        $this->_writer->setIndentString($this->_config['indentstr']);
+        
+        $this->_writer->startDocument('1.0', 'UTF-8');
+        $this->_writer->startElement('spizerlog');
+        $this->_writer->writeAttribute('xmlns', 'http://arr.gr/spizer/xmllog/1.0');
+        $this->_writer->writeAttribute('microtime', microtime(true));
     }
 
     /**
-     * 
+     *  
      * @see Spizer_Logger_Interface::startPage()
      */
     public  function startPage() 
     {
-        if ($this->_inPage) {
-            $this->endPage();
-        }
-        
-        $this->_writeXml('<page>');
-        $this->_inPage = true;
-        
-        ++$this->_indent;
+        $this->_writer->startElement('page');
     }
   
 	/**
@@ -92,11 +96,7 @@ class Spizer_Logger_Xml implements Spizer_Logger_Interface
 	 */
     public  function endPage() 
     {
-        if (! $this->_inPage) return;
-        
-        --$this->_indent;
-        $this->_writeXml('</page>');
-        $this->_inPage = false;
+        $this->_writer->endElement(); // page
     }
   
     /**
@@ -105,15 +105,14 @@ class Spizer_Logger_Xml implements Spizer_Logger_Interface
      */
     public  function logHandlerInfo($handler, $info = array()) 
     {
-          $this->_writeXml('<handlerInfo handler="' . htmlentities($handler) . '">');
-          ++$this->_indent;
-          
-          foreach($info as $field => $value) {
-              $this->_writeXml("<$field>" . htmlentities($value) . "</$field>");
-          }
-          
-          --$this->_indent;
-          $this->_writeXml('</handlerInfo>');
+        $this->_writer->startElement('handlerInfo');
+        $this->_writer->writeAttribute('handler', $handler);
+
+        foreach($info as $field => $value) {
+            $this->_writer->writeElement($field, $value);
+        }
+        
+        $this->_writer->endElement(); // handlerInfo
     }
   
     /**
@@ -124,21 +123,22 @@ class Spizer_Logger_Xml implements Spizer_Logger_Interface
      */
     public  function logRequest(Spizer_Request $request) 
     {
-        $this->_writeXml('<request microtime="' . microtime(true) . '">');
-        ++$this->_indent;
+        $this->_writer->startElement('request');
+        $this->_writer->writeAttribute('microtime', microtime(true));
         
-        $this->_writeXml('<uri>' . htmlentities($request->getUri()) . '</uri>');
-        $this->_writeXml('<method>' . htmlentities($request->getMethod()) . '</method>');
+        $this->_writer->writeElement('uri', $request->getUri());
+        $this->_writer->writeElement('method', $request->getMethod());
         
         $ref = $request->getReferrer();
-        if ($ref) $this->_writeXml('<referrer>' . htmlentities($ref) . '</referrer>');
+        if ($ref) $this->_writer->writeElement('referrer', $ref);
         
-        foreach($request->getAllHeaders() as $header => $value) {
-            $this->_writeXml('<header name="' . $header . '">' . htmlentities($value) . "</header>");
+        if ($this->_config['logheaders']) {
+            foreach($request->getAllHeaders() as $header => $value) {
+                $this->_logHeader($header, $value);
+            }
         }
-        
-        --$this->_indent;
-        $this->_writeXml('</request>');
+
+        $this->_writer->endElement(); // request
     }
   
     /**
@@ -150,19 +150,20 @@ class Spizer_Logger_Xml implements Spizer_Logger_Interface
      */
     public  function logResponse(Spizer_Response $response) 
     {
-        $this->_writeXml('<response microtime="' . microtime(true) . '">');
-        ++$this->_indent;
-        
-        $this->_writeXml('<status>' . $response->getStatus() . '</status>');
-        $this->_writeXml('<message>' . htmlentities($response->getMessage()) . '</response>');
+        $this->_writer->startElement('response');
+        $this->_writer->writeAttribute('microtime', microtime(true));
+
+        $this->_writer->writeElement('status', $response->getStatus());
+        $this->_writer->writeElement('message', $response->getMessage());
         
         // Log response headers
-        foreach($response->getHeaders() as $header => $value) {
-            $this->_logHeader($header, $value);
+        if ($this->_config['logheaders']) {
+            foreach($response->getHeaders() as $header => $value) {
+                $this->_logHeader($header, $value);
+            }
         }
-        
-        --$this->_indent;
-        $this->_writeXml('</response>');
+
+        $this->_writer->endElement(); // response
     }
     
     /**
@@ -173,26 +174,16 @@ class Spizer_Logger_Xml implements Spizer_Logger_Interface
      * @param  string|array $value
      * @return void
      */
-    protected function _logHeader($key, $value)
+    protected function _logHeader($header, $value)
     {
         if (is_array($value)) {
-            foreach ($value as $v) $this->_logHeader($key, $v);
+            foreach ($value as $v) $this->_logHeader($header, $v);
         } else {
-            $key = htmlentities($key);
-            $this->_writeXml('<header name="' . $key . '">' . htmlentities($value) . "</header>");
+            $this->_writer->startElement('header');
+            $this->_writer->writeAttribute('name', $header);
+            $this->_writer->text($value);
+            $this->_writer->endElement(); // header
         }
-    }
-    
-    /**
-     * Internal helper to write a line to the XML output
-     *
-     * @param  string $line
-     * @return void
-     */
-    protected function _writeXml($line)
-    {
-        $line = str_repeat("  ", $this->_indent) . $line . "\n";
-        fwrite($this->_target, $line);
     }
     
     /**
@@ -203,12 +194,7 @@ class Spizer_Logger_Xml implements Spizer_Logger_Interface
      */
     public function __destruct()
     {
-        // Close XML
-        if ($this->_inPage) $this->endPage();
-        --$this->_indent;
-        $this->_writeXml('</spizerlog>');
-        
-        // Close file
-        fclose($this->_target);
+        $this->_writer->endDocument();
+        $this->_writer->flush();
     }
 }
