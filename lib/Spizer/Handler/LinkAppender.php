@@ -121,7 +121,7 @@ class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract
 				    
 				// If any of the URL parts is invalid, an exception will be caught here
 			    } catch (Zend_Uri_Exception $e) {
-			        $this->_engine->log('LinkAppender', array(
+			        $this->_log(array(
 			            'link'    => $link,  
 			            'message' => 'Unable to parse link URL: ' . $e->getMessage()
 			        ));

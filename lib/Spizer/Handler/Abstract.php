@@ -128,6 +128,16 @@ abstract class Spizer_Handler_Abstract
 	}
 	
 	/**
+	 * Pass some data to the logger
+	 * 
+	 * @param array $data
+	 */
+	protected function _log($data)
+	{
+	    $this->_engine->log($this->_name, $data);
+	}
+	
+	/**
 	 * Handle document
 	 *
 	 * @param Spizer_Document $document
