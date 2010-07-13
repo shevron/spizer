@@ -44,12 +44,12 @@ class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract
     protected $_config = array(
         'status'        => null,
         'content-type'  => null,
-        'follow_href'   => true,
-        'follow_img'    => false,
-        'follow_link'   => false,
-        'follow_script' => false,
-        'follow_frames' => false,
-        'same-domain'   => false
+        'followhref'    => true,
+        'followimg'     => false,
+        'followlink'    => false,
+        'followscript'  => false,
+        'followframes'  => false,
+        'samedomain'    => false
     );
     
     /**
@@ -61,7 +61,7 @@ class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract
     public function handle(Spizer_Document $doc)
     {
         // If need, set the match domain according to the first URL
-        if (! isset($this->_config['domain']) && $this->_config['same-domain']) {
+        if (! isset($this->_config['domain']) && $this->_config['samedomain']) {
             $this->_config['domain'] = $this->_engine->getBaseUri()->getHost();
         }
         
@@ -74,11 +74,11 @@ class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract
         
         // Fetch links out of the document
         $links = array();
-        if ($this->_config['follow_href'])   $links = array_merge($links, $doc->getLinks()); 
-        if ($this->_config['follow_img'])    $links = array_merge($links, $doc->getImages());
-        if ($this->_config['follow_link'])   $links = array_merge($links, $doc->getHeaderLinks());
-        if ($this->_config['follow_script']) $links = array_merge($links, $doc->getScriptLinks());
-        if ($this->_config['follow_frames']) $links = array_merge($links, $doc->getFrameLinks());
+        if ($this->_config['followhref'])   $links = array_merge($links, $doc->getLinks()); 
+        if ($this->_config['followimg'])    $links = array_merge($links, $doc->getImages());
+        if ($this->_config['followlink'])   $links = array_merge($links, $doc->getHeaderLinks());
+        if ($this->_config['followscript']) $links = array_merge($links, $doc->getScriptLinks());
+        if ($this->_config['followframes']) $links = array_merge($links, $doc->getFrameLinks());
         
         // Iterate over all document links
 		foreach ($links as $link) {

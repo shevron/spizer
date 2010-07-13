@@ -19,7 +19,7 @@ default:
     LinkAppender:
       type:         LinkAppender
       options: 
-        same-domain:  yes
+        samedomain:  yes
 
     MatchWarningMessages:
       type:         StringMatch
