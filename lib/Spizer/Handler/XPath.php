@@ -63,16 +63,24 @@ class Spizer_Handler_XPath extends Spizer_Handler_Abstract
         
         $query = $this->_config['query'];
         $tags = $document->getXpath()->query($query);
-        if ($tags instanceof DOMNodeList && $tags->length) {
-            $data = array(
-                'query'        => $query,
-                'matchingTags' => count($tags->length),
-            );
+        if ($tags instanceof DOMNodeList) {
+            foreach ($tags as $tag) {
+                $data = array(
+                    'query' => $query,
+                );
             
-            if (isset($this->_config['message'])) 
-                $data['message'] = $this->_config['message'];
+                if (isset($this->_config['message'])) 
+                    $data['message'] = $this->_config['message'];
+                    
+                if (isset($this->_config['captureValue'])) {
+                    $value = $document->getXpath()->evaluate($this->_config['captureValue'], $tag);
+                    if ($value) {
+                        $data['captureValue'] = (string) $value;
+                    }
+                }
             
-            $this->_log($data);
+                $this->_log($data);
+            }
         }
     }
 }
