@@ -43,6 +43,8 @@ class Spizer_Document_Html extends Spizer_Document_Xml
 	
 	protected $_forms       = null;
 	
+	protected $_frames      = null;
+	
 	/**
 	 * Get all <a href=""> links out of this document
 	 *
@@ -51,7 +53,7 @@ class Spizer_Document_Html extends Spizer_Document_Xml
 	 */
 	public function getLinks()
 	{
-		if ($this->_links == null) {
+		if ($this->_links === null) {
 			$this->_links = array();
 			$links = $this->getXpath()->query("//a[@href]");
 		
@@ -72,7 +74,7 @@ class Spizer_Document_Html extends Spizer_Document_Xml
 	 */
 	public function getHeaderLinks()
 	{
-	    if ($this->_headerlinks == null) {
+	    if ($this->_headerlinks === null) {
 	        $this->_headerlinks = array();
 	        $links = $this->getXpath()->query("//link[@href]");
 		
@@ -91,7 +93,7 @@ class Spizer_Document_Html extends Spizer_Document_Xml
 	 */
 	public function getImages()
 	{
-	    if ($this->_images == null) {
+	    if ($this->_images === null) {
 	        $this->_images = array();
 	        $images = $this->getXpath()->query("//img[@src]");
 	        
@@ -110,7 +112,7 @@ class Spizer_Document_Html extends Spizer_Document_Xml
 	 */
 	public function getScriptLinks()
 	{
-	    if ($this->_scripts == null) {
+	    if ($this->_scripts === null) {
 	        $this->_scripts = array();
 	        $scripts = $this->getXpath()->query("//script[@src]");
 	        
@@ -120,5 +122,24 @@ class Spizer_Document_Html extends Spizer_Document_Xml
 	    }
 	    
 	    return $this->_scripts;
+	}
+	
+	/**
+	 * Get all <frame src=""> external URL references
+	 * 
+	 * @return array Array of frame URLs
+	 */
+	public function getFrameLinks()
+	{
+	    if ($this->_frames === null) {
+	        $this->_frames = array();
+	        $frames = $this->getXpath()->query('//frameset/frame[@src]');
+
+	        foreach($frames as $frame) {
+	            $this->_frames[] = $frame->getAttribute('src');
+	        }
+	    }
+	    
+	    return $this->_frames;
 	}
 }

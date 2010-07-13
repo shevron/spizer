@@ -48,6 +48,7 @@ class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract
         'follow_img'    => false,
         'follow_link'   => false,
         'follow_script' => false,
+        'follow_frames' => false,
         'same-domain'   => false
     );
     
@@ -77,6 +78,7 @@ class Spizer_Handler_LinkAppender extends Spizer_Handler_Abstract
         if ($this->_config['follow_img'])    $links = array_merge($links, $doc->getImages());
         if ($this->_config['follow_link'])   $links = array_merge($links, $doc->getHeaderLinks());
         if ($this->_config['follow_script']) $links = array_merge($links, $doc->getScriptLinks());
+        if ($this->_config['follow_frames']) $links = array_merge($links, $doc->getFrameLinks());
         
         // Iterate over all document links
 		foreach ($links as $link) {
